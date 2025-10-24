@@ -1,0 +1,42 @@
+# Quix Project Descriptor
+# This file describes the data pipeline and configuration of resources of a Quix Project.
+
+metadata:
+  version: 1.0
+
+# This section describes the Deployments of the data pipeline
+deployments:
+  - name: Marimo
+    application: marimo
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 1000
+      memory: 4000
+      replicas: 1
+    publicAccess:
+      enabled: true
+      urlPrefix: marimo-analysis
+    state:
+      enabled: true
+      size: 1
+    network:
+      ports:
+        - port: 80
+          targetPort: 8080
+  - name: Simple Marimo
+    application: marimo_simple
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 1000
+      memory: 4000
+      replicas: 1
+    publicAccess:
+      enabled: true
+      urlPrefix: simplemarimo-c42ffa5
+    network:
+      ports:
+        - port: 80
+          targetPort: 8080
+
