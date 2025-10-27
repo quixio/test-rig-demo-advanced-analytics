@@ -40,3 +40,6 @@ deployments:
         - port: 80
           targetPort: 8080
 
+# This section describes the Topics of the data pipeline
+topics:
+  - name: http-source
