@@ -69,9 +69,19 @@ def _(requests):
 
     # Check response
     if response.status_code == 200:
-        data = response.json()   # Parse JSON
+        response_data = response.json()   # Parse JSON
+        # Extract the items list from the response
+        if isinstance(response_data, dict) and "items" in response_data:
+            data = response_data["items"]
+        elif isinstance(response_data, list):
+            data = response_data
+        else:
+            print(f"Warning: Unexpected response format: {type(response_data).__name__}")
+            print(f"Data: {response_data}")
+            data = []  # Default to empty list
     else:
         print(f"Error {response.status_code}: {response.text}")
+        data = []  # Default to empty list on error
     return (data,)
 
 
@@ -82,15 +92,30 @@ def _(data, defaultdict):
 
     def build_hierarchy(data_list):
         hierarchy = defaultdict(lambda: defaultdict(dict))
-    
+
+        # Ensure data_list is actually a list
+        if not isinstance(data_list, list):
+            print(f"Error: build_hierarchy expects a list, got {type(data_list).__name__}")
+            return hierarchy
+
         for item in data_list:
+            # Skip if item is not a dictionary
+            if not isinstance(item, dict):
+                print(f"Warning: Skipping non-dict item: {item}")
+                continue
+
+            # Check for required keys
+            if "environment_id" not in item or "campaign_id" not in item or "test_id" not in item:
+                print(f"Warning: Skipping item missing required keys: {item}")
+                continue
+
             env = item["environment_id"]
             campaign = item["campaign_id"]
             test = item["test_id"]
-        
+
             # Store the whole test dict (you can customize if you only want part of it)
             hierarchy[campaign][env][test] = None
-    
+
         return hierarchy
 
     dict_tags = build_hierarchy(data)
