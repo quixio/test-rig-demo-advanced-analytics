@@ -60,8 +60,11 @@ def _(mo):
 
 @app.cell
 def _(requests):
-    url = "https://backend-quixers-testrigdemoconfigurationmet-5f306d01.az-france-0.app.quix.io/api/v1/tests"
-    headers = {"accept": "application/json"}
+    url = "https://backend-api-quixers-quixtestmanager-new.az-france-0.app.quix.io/api/v1/tests"
+    headers = {
+        "accept": "application/json",
+        "Authorization": "Bearer sdk-2be80acf56ea48b8bd4dadf2e6a34c1b"
+    }
     response = requests.get(url, headers=headers)
 
     # Check response
