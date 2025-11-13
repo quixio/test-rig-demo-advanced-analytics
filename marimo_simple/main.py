@@ -57,19 +57,7 @@ def _(mo):
     campaign_id = q.get("campaign_id", 'AERO_SHOW_DEMO')
     environment_id = q.get("environment_id", 'ENV_01')
     test_id = q.get("test_id", 'javi-23-09-t001')
-    theme = q.get("theme", "light")
-
-    # Apply theme using CSS
-    if theme == "dark":
-        mo.Html("""
-        <style>
-        :root {
-            color-scheme: dark;
-        }
-        </style>
-        """)
-
-    return campaign_id, environment_id, test_id, theme
+    return campaign_id, environment_id, test_id
 
 
 @app.cell
