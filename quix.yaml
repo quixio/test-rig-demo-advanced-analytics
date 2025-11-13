@@ -60,6 +60,17 @@ deployments:
       ports:
         - port: 80
           targetPort: 8080
+    variables:
+      - name: QUIXLAKE_TOKEN
+        inputType: Secret
+        description: QuixLake API Token
+        required: true
+        secretKey: test_manager_pat_token
+      - name: QUIXLAKE_BASE_URL
+        inputType: FreeText
+        description: QuixLake Base URL
+        required: true
+        value: https://quixlake-quixers-testrigdemodatawarehouse-prod.az-france-0.app.quix.io/
 
 # This section describes the Topics of the data pipeline
 topics:
