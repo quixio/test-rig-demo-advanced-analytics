@@ -3,3 +3,24 @@ language: python
 dockerfile: dockerfile
 runEntryPoint: dockerfile
 defaultFile: requirements.txt
+variables:
+  - name: BACKEND_API_URL
+    inputType: FreeText
+    description: Backend API URL for test data
+    defaultValue: https://backend-api-quixers-quixtestmanager-new.az-france-0.app.quix.io/api/v1/tests
+    required: true
+  - name: BACKEND_API_TOKEN
+    inputType: Secret
+    description: Bearer token for Backend API authentication
+    defaultValue: ""
+    required: true
+  - name: QUIXLAKE_URL
+    inputType: FreeText
+    description: QuixLake base URL
+    defaultValue: https://quixlake-quixers-testrigdemodatawarehouse-prod.az-france-0.app.quix.io/
+    required: true
+  - name: QUIXLAKE_TOKEN
+    inputType: Secret
+    description: Bearer token for QuixLake authentication
+    defaultValue: ""
+    required: true
