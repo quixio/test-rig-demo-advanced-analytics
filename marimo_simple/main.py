@@ -1,7 +1,8 @@
 import marimo
+import os
 
 __generated_with = "0.16.2"
-app = marimo.App(width="wide")
+app = marimo.App(width="wide", app_title="Test Rig Demo - Simple", theme="dark")
 
 
 @app.cell
@@ -57,11 +58,12 @@ def _(mo):
 
 
 @app.cell
-def _(QuixLakeClient):
-    MYTOKEN = "sdk-95f80fd699934f759b2f12f3c06f34d9"
+def _(QuixLakeClient, os):
+    MYTOKEN = os.getenv("QUIXLAKE_TOKEN")
+    BASE_URL = os.getenv("QUIXLAKE_BASE_URL")
 
     client = QuixLakeClient(
-        base_url = "https://quixlake-quixers-testrigdemodatawarehouse-prod.az-france-0.app.quix.io/", 
+        base_url = BASE_URL,
         token = MYTOKEN)
     return (client,)
 
