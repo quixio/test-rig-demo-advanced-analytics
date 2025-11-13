@@ -70,7 +70,7 @@ deployments:
         inputType: FreeText
         description: QuixLake Base URL
         required: true
-        value: https://quixlake-quixers-testrigdemodatawarehouse-prod.az-france-0.app.quix.io/
+        value: https://quixlake-quixers-testrigdemodatawarehouse-prod.az-france-0.app.quix.io
 
 # This section describes the Topics of the data pipeline
 topics:
