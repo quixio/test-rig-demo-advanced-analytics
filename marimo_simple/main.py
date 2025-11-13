@@ -1,8 +1,7 @@
 import marimo
-import os
 
-__generated_with = "0.16.2"
-app = marimo.App(width="wide", app_title="Test Rig Demo - Simple", theme="dark")
+__generated_with = "0.17.7"
+app = marimo.App(width="wide", app_title="Test Rig Demo - Simple")
 
 
 @app.cell
@@ -13,6 +12,8 @@ def _():
     import numpy as np
     import matplotlib.pyplot as plt
     import seaborn as sns
+    from dotenv import load_dotenv
+    load_dotenv(".env")
     sns.set()
     return mo, pd, plt
 
@@ -43,7 +44,9 @@ def value_to_Newtons(value, abs_value=True, CF=39498.19765159356, zero=-678):
 
 @app.cell
 def _(mo):
-    mo.md(r"""## Experiment data""")
+    mo.md(r"""
+    ## Experiment data
+    """)
     return
 
 
@@ -58,7 +61,10 @@ def _(mo):
 
 
 @app.cell
-def _(QuixLakeClient, os):
+def _(QuixLakeClient):
+    import os
+    print(os.getenv("QUIXLAKE_BASE_URL"))
+
     MYTOKEN = os.getenv("QUIXLAKE_TOKEN")
     BASE_URL = os.getenv("QUIXLAKE_BASE_URL")
 
