@@ -3,3 +3,13 @@ language: python
 dockerfile: dockerfile
 runEntryPoint: dockerfile
 defaultFile: requirements.txt
+variables:
+  - name: QUIXLAKE_TOKEN
+    inputType: Secret
+    description: QuixLake API Token
+    required: true
+  - name: QUIXLAKE_BASE_URL
+    inputType: FreeText
+    description: QuixLake Base URL
+    required: true
+    defaultValue: https://quixlake-quixers-testrigdemodatawarehouse-prod.az-france-0.app.quix.io/

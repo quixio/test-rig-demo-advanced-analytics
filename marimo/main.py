@@ -1,12 +1,14 @@
 import marimo
 
-__generated_with = "0.16.2"
+__generated_with = "0.14.17"
 app = marimo.App(width="wide")
 
 
 @app.cell
 def _():
     import math
+    import os
+    from pathlib import Path
     import requests
     import marimo as mo
     import pandas as pd
@@ -14,8 +16,14 @@ def _():
     import matplotlib.pyplot as plt
     from collections import defaultdict
     import seaborn as sns
+    from dotenv import load_dotenv
+
+    # Load environment variables from .env file
+    env_path = Path(__file__).parent / '.env'
+    load_dotenv(dotenv_path=env_path)
+
     sns.set()
-    return defaultdict, math, mo, np, pd, plt, requests
+    return Path, defaultdict, load_dotenv, math, mo, np, os, pd, plt, requests
 
 
 @app.cell
@@ -59,16 +67,30 @@ def _(mo):
 
 
 @app.cell
-def _(requests):
-    url = "https://backend-quixers-testrigdemoconfigurationmet-5f306d01.az-france-0.app.quix.io/api/v1/tests"
-    headers = {"accept": "application/json"}
+def _(os, requests):
+    url = os.getenv("BACKEND_API_URL")
+    backend_token = os.getenv("BACKEND_API_TOKEN")
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {backend_token}"
+    }
     response = requests.get(url, headers=headers)
 
     # Check response
     if response.status_code == 200:
-        data = response.json()   # Parse JSON
+        response_data = response.json()   # Parse JSON
+        # Extract the items list from the response
+        if isinstance(response_data, dict) and "items" in response_data:
+            data = response_data["items"]
+        elif isinstance(response_data, list):
+            data = response_data
+        else:
+            print(f"Warning: Unexpected response format: {type(response_data).__name__}")
+            print(f"Data: {response_data}")
+            data = []  # Default to empty list
     else:
         print(f"Error {response.status_code}: {response.text}")
+        data = []  # Default to empty list on error
     return (data,)
 
 
@@ -79,15 +101,30 @@ def _(data, defaultdict):
 
     def build_hierarchy(data_list):
         hierarchy = defaultdict(lambda: defaultdict(dict))
-    
+
+        # Ensure data_list is actually a list
+        if not isinstance(data_list, list):
+            print(f"Error: build_hierarchy expects a list, got {type(data_list).__name__}")
+            return hierarchy
+
         for item in data_list:
+            # Skip if item is not a dictionary
+            if not isinstance(item, dict):
+                print(f"Warning: Skipping non-dict item: {item}")
+                continue
+
+            # Check for required keys
+            if "environment_id" not in item or "campaign_id" not in item or "test_id" not in item:
+                print(f"Warning: Skipping item missing required keys: {item}")
+                continue
+
             env = item["environment_id"]
             campaign = item["campaign_id"]
             test = item["test_id"]
-        
+
             # Store the whole test dict (you can customize if you only want part of it)
             hierarchy[campaign][env][test] = None
-    
+
         return hierarchy
 
     dict_tags = build_hierarchy(data)
@@ -138,12 +175,13 @@ def _(campaign_selector, dict_tags, environment_selector, mo, test_id):
 
 
 @app.cell
-def _(QuixLakeClient):
-    MYTOKEN = "sdk-95f80fd699934f759b2f12f3c06f34d9"
+def _(QuixLakeClient, os):
+    quixlake_url = os.getenv("QUIXLAKE_URL")
+    quixlake_token = os.getenv("QUIXLAKE_TOKEN")
 
     client = QuixLakeClient(
-        base_url = "https://quixlake-quixers-testrigdemodatawarehouse-prod.az-france-0.app.quix.io/", 
-        token = MYTOKEN)
+        base_url = quixlake_url,
+        token = quixlake_token)
     return (client,)
 
 
@@ -307,7 +345,7 @@ def _(np, pd, plt):
                 else:
                     if df_e[col].quantile(0.95)*1.2 < df_e[col].max():
                         ax.set_ylim(bottom = df_e[col].quantile(0.05)*0.95, top=df_e[col].quantile(0.95)*1.1)
-                    
+
         plt.tight_layout(rect=[0, 0, 1, 0.96])
         return fig
     return (
@@ -653,11 +691,13 @@ def _(mo):
 
 @app.cell
 def _(campaign_selector, environment_selector, mo, test_selector):
-    mo.md(f"""
+    mo.md(
+        f"""
     - **Campaign ID:** {campaign_selector.value}  
     - **Environment ID:** {environment_selector.value}  
-    - **Test ID:** {test_selector.value}  
-        """)
+    - **Test ID:** {test_selector.value}
+    """
+    )
     return
 
 
@@ -775,10 +815,10 @@ def _(np, plt):
         for ax, col, ylabel in plots:
             ax.set_ylabel(ylabel)
             ax.grid(True)
-    
+
             # Legend
             ax.legend()
-    
+
             # Text annotations (only if figures=True)
             if figures:
                 for df_e, label, color in zip(list_df_es, list_labels, colors):
@@ -796,7 +836,7 @@ def _(np, plt):
                         ax.text(0.5, 0.5, f"{label}: {_val:.1f}",
                                 transform=ax.transAxes, fontsize=12, color=color,
                                 alpha=0.7, ha="center", va="center")
-    
+
             # Zoom logic (always runs)
             all_vals = np.concatenate([df[col].dropna().values for df in list_df_es])
             if zoom:
@@ -853,10 +893,10 @@ def _(np, plt):
         for ax, col, ylabel in plots:
             ax.set_ylabel(ylabel)
             ax.grid(True)
-    
+
             # Legend
             ax.legend()
-    
+
             # Text annotations (only if figures=True)
             if figures:
                 for df_m, label, color in zip(list_df_ms, list_labels, colors):
@@ -874,7 +914,7 @@ def _(np, plt):
                         ax.text(0.5, 0.5, f"{label}: {_val:.1f}",
                                 transform=ax.transAxes, fontsize=12, color=color,
                                 alpha=0.7, ha="center", va="center")
-    
+
             # Zoom logic (always runs)
             all_vals = np.concatenate([df[col].dropna().values for df in list_df_ms])
             if zoom:
